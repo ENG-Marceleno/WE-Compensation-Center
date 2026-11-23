@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WE Compensation Center</title>
+<!-- الأيقونة: استبدل السطرين دول بالـ base64 الأصلي بتاعك لو عايز -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237a2bd1'/%3E%3Cstop offset='1' stop-color='%23ff4fb8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M10 20l9 24 13-20 13 20 9-24' fill='none' stroke='white' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+/* ============ 1. DESIGN TOKENS ============ */
+:root{
+  --plum-950:#12041f; --plum-900:#1e0634; --plum-800:#2d0a4e; --plum-700:#43107a;
+  --violet:#6a1fb5; --magenta:#d1138f; --pink:#ff4fb8; --white:#fff;
+  --text:#f7f0ff; --text-dim:rgba(247,240,255,.68);
+  --glass:rgba(255,255,255,.08); --glass-strong:rgba(255,255,255,.14);
+  --glass-border:rgba(255,255,255,.22);
+  --grad-we:linear-gradient(120deg,#7a2bd1 0%,#c2189a 55%,#ff4fb8 100%);
+  --radius-lg:28px; --radius-md:18px;
+  --font:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --ease:cubic-bezier(.22,.8,.26,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font);color:var(--text);background:var(--plum-950);
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);
+}
+
+/* ============ 2. BACKGROUND ============ */
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;
+  background:
+    radial-gradient(1200px 700px at 12% -10%,#5b1796 0%,transparent 60%),
+    radial-gradient(900px 600px at 100% 10%,#a3117a 0%,transparent 55%),
+    radial-gradient(900px 700px at 50% 120%,#3a0d68 0%,transparent 60%),
+    linear-gradient(160deg,var(--plum-900),var(--plum-950));}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;will-change:transform}
+.orb.a{width:46vmax;height:46vmax;left:-14vmax;top:-12vmax;background:#7a2bd1;animation:drift1 26s ease-in-out infinite alternate}
+.orb.b{width:38vmax;height:38vmax;right:-12vmax;top:18vh;background:#d1138f;opacity:.42;animation:drift2 32s ease-in-out infinite alternate}
+.orb.c{width:30vmax;height:30vmax;left:30vw;bottom:-16vmax;background:#4b1d9e;animation:drift3 38s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate3d(9vw,7vh,0) scale(1.1)}}
+@keyframes drift2{to{transform:translate3d(-8vw,-9vh,0) scale(1.15)}}
+@keyframes drift3{to{transform:translate3d(10vw,-6vh,0) scale(.92)}}
+.grid{position:absolute;inset:0;opacity:.07;
+  background-image:linear-gradient(rgba(255,255,255,.7) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.7) 1px,transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000 10%,transparent 70%);
+          mask-image:radial-gradient(ellipse at 50% 30%,#000 10%,transparent 70%);}
+.ring{position:absolute;right:6vw;top:14vh;width:min(46vmin,420px);aspect-ratio:1;border-radius:50%;
+  border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 0 80px rgba(255,79,184,.10),0 0 80px rgba(122,43,209,.18);
+  animation:spin 70s linear infinite}
+.ring::after{content:"";position:absolute;inset:14%;border-radius:50%;border:1px dashed rgba(255,255,255,.14)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.noise{position:absolute;inset:0;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+
+/* ============ 3. LAYOUT ============ */
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;
+  padding:clamp(12px,2.2vw,28px);gap:clamp(12px,2vw,22px)}
+
+/* ============ 4. HEADER ============ */
+.glass{
+  position:relative;background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.05));
+  border:1px solid var(--glass-border);
+  -webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);
+  box-shadow:0 24px 60px -18px rgba(8,0,20,.7),0 2px 0 rgba(255,255,255,.18) inset,0 0 0 1px rgba(255,255,255,.03);
+  overflow:hidden}
+.glass::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,0) 32%);
+  opacity:.55}
+.header{border-radius:var(--radius-lg);padding:clamp(14px,1.8vw,22px) clamp(16px,2.4vw,30px);
+  display:flex;align-items:center;gap:clamp(14px,2.4vw,36px);flex-wrap:wrap}
+.header::after{content:"";position:absolute;left:8%;right:8%;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,#ff9be0,transparent);opacity:.9}
+
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.logo{width:54px;height:54px;flex:none;border-radius:18px;display:grid;place-items:center;position:relative;
+  background:var(--grad-we);box-shadow:0 10px 30px -6px rgba(209,19,143,.75),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -8px 16px rgba(60,0,90,.35)}
+.logo::after{content:"";position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(160deg,rgba(255,255,255,.4),transparent 45%)}
+.logo svg{width:32px;height:32px;position:relative;z-index:1;filter:drop-shadow(0 2px 4px rgba(60,0,90,.4))}
+.brand-text{display:flex;flex-direction:column;line-height:1.1;min-width:0}
+.brand-text strong{font-size:clamp(1.05rem,1.6vw,1.4rem);font-weight:700;letter-spacing:.01em;white-space:nowrap}
+.brand-text span{font-size:.78rem;color:var(--text-dim);margin-top:5px;letter-spacing:.02em}
+
+.penguin{margin-left:auto;flex:none;width:64px;height:64px;border-radius:50%;display:block;overflow:hidden;
+  border:2px solid rgba(255,255,255,.6);background:var(--grad-we);
+  box-shadow:0 10px 28px -8px rgba(209,19,143,.8),inset 0 1px 0 rgba(255,255,255,.5);
+  transition:transform .35s var(--ease),box-shadow .35s var(--ease);-webkit-tap-highlight-color:transparent}
+.penguin svg{width:100%;height:100%;display:block}
+.penguin:hover{transform:translateY(-2px) scale(1.08);box-shadow:0 14px 34px -8px rgba(255,79,184,.95),inset 0 1px 0 rgba(255,255,255,.5)}
+.penguin:focus-visible{outline:2px solid #ff9be0;outline-offset:3px}
+.status{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.8rem;color:var(--text-dim);
+  padding:8px 14px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-border)}
+.dot{width:8px;height:8px;border-radius:50%;background:#5dffb0;box-shadow:0 0 0 0 rgba(93,255,176,.6);animation:pulse 2.6s ease-out infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 9px rgba(93,255,176,0)}100%{box-shadow:0 0 0 0 rgba(93,255,176,0)}}
+
+/* ============ 5. NAVIGATION ============ */
+.nav{order:3;flex-basis:100%;position:relative;display:flex;gap:6px;padding:6px;border-radius:22px;
+  background:rgba(20,2,40,.38);border:1px solid rgba(255,255,255,.12);
+  box-shadow:inset 0 2px 10px rgba(0,0,0,.35)}
+.tab{position:relative;z-index:2;flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:clamp(12px,1.5vw,16px) clamp(10px,2vw,24px);border:0;background:none;color:var(--text-dim);
+  font:600 clamp(.82rem,1.1vw,1rem)/1.2 var(--font);letter-spacing:.01em;cursor:pointer;border-radius:16px;
+  transition:color .35s var(--ease),transform .35s var(--ease),background .35s var(--ease);
+  -webkit-tap-highlight-color:transparent}
+.tab svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .45s var(--ease)}
+.tab span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tab:hover{color:#fff;background:rgba(255,255,255,.06)}
+.tab:hover svg{transform:translateY(-2px) scale(1.12)}
+.tab[aria-selected="true"]{color:#fff;background:none}
+.tab:focus-visible{outline:2px solid #ff9be0;outline-offset:2px}
+
+/* sliding glass highlight */
+.pill{position:absolute;z-index:1;top:6px;bottom:6px;left:0;width:0;border-radius:16px;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.34),rgba(255,255,255,.12));
+  border:1px solid rgba(255,255,255,.55);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 10px 30px -8px rgba(255,79,184,.65),0 0 24px rgba(209,19,143,.35),inset 0 1px 0 rgba(255,255,255,.7),inset 0 -12px 20px rgba(209,19,143,.25);
+  transition:transform .55s var(--ease),width .55s var(--ease);overflow:hidden}
+.pill::before{content:"";position:absolute;inset:0;background:var(--grad-we);opacity:.45}
+.pill::after{content:"";position:absolute;top:0;left:-60%;width:50%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);
+  transform:skewX(-20deg);animation:sheen 5s ease-in-out infinite}
+@keyframes sheen{0%,60%{left:-60%}100%{left:130%}}
+
+/* ============ 6. WORKSPACES ============ */
+.stage{flex:1;position:relative;display:flex;min-height:0}
+.workspace{flex:1;display:none;border-radius:var(--radius-lg);min-height:clamp(380px,60vh,none)}
+.workspace.active{display:block;animation:enter .5s var(--ease) both}
+@keyframes enter{from{opacity:0;transform:translateY(14px) scale(.992);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+.workspace::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--grad-we);opacity:.85;
+  box-shadow:0 0 24px 2px rgba(255,79,184,.6)}
+
+/* ============ 6b. TTS TECH CON ============ */
+.tts{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(14px,2vw,26px);padding:clamp(14px,2.4vw,30px) clamp(14px,2.4vw,30px) clamp(20px,2.6vw,34px)}
+.pane{border-radius:22px;padding:clamp(14px,1.6vw,20px);display:flex;flex-direction:column;gap:14px;min-width:0;
+  background:rgba(20,2,40,.36);border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 2px 14px rgba(0,0,0,.28)}
+.pane-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.pane-head h2{font-size:1.05rem;font-weight:650;letter-spacing:.01em}
+.actions{display:flex;gap:8px}
+.btn{font:600 .82rem var(--font);color:var(--text);padding:8px 14px;border-radius:12px;cursor:pointer;
+  background:var(--glass);border:1px solid var(--glass-border);transition:background .25s,transform .25s var(--ease),box-shadow .25s}
+.btn:hover{background:var(--glass-strong);transform:translateY(-1px);box-shadow:0 8px 20px -8px rgba(255,79,184,.6)}
+.btn:focus-visible,textarea:focus-visible{outline:2px solid #ff9be0;outline-offset:2px}
+.col{display:flex;flex-direction:column;gap:clamp(14px,2vw,26px);min-width:0}
+.pane-calc{flex:1;min-height:150px}
+#calcBox{flex:1;display:flex;flex-direction:column;gap:12px}
+.alert{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 16px;border-radius:16px;
+  background:rgba(255,120,80,.12);border:1px solid rgba(255,160,120,.55);box-shadow:0 10px 28px -14px rgba(255,120,80,.6)}
+.alert p{flex:1 1 240px;font-size:.92rem;font-weight:600;line-height:1.5;color:#ffe3d6}
+.btn-link{display:inline-block;padding:10px 18px;border-radius:12px;color:#fff;text-decoration:none;font:650 .85rem var(--font);
+  background:var(--grad-we);border:1px solid rgba(255,255,255,.4);box-shadow:0 10px 24px -10px rgba(255,79,184,.8),inset 0 1px 0 rgba(255,255,255,.45);
+  transition:transform .25s var(--ease),box-shadow .25s}
+.btn-link:hover{transform:translateY(-2px);box-shadow:0 14px 30px -10px rgba(255,79,184,.95),inset 0 1px 0 rgba(255,255,255,.45)}
+.btn-link:focus-visible{outline:2px solid #ff9be0;outline-offset:3px}
+.calc-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.calc-half{border-radius:18px;padding:16px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;
+  background:var(--glass);border:1px solid var(--glass-border);min-width:0}
+.calc-half small{font-size:.9rem;font-weight:650}
+.calc-half em{font-style:normal;font-size:.76rem;color:var(--text-dim);min-height:1em;overflow-wrap:anywhere}
+.calc-val{font-size:clamp(1.7rem,3.4vw,2.5rem);font-weight:750;line-height:1;font-variant-numeric:tabular-nums}
+.calc-val span{font-size:.5em;font-weight:600;color:var(--text-dim)}
+.calc-half.double{background:linear-gradient(135deg,rgba(122,43,209,.55),rgba(209,19,143,.5));border-color:rgba(255,255,255,.35);
+  box-shadow:0 14px 34px -14px rgba(209,19,143,.7),inset 0 1px 0 rgba(255,255,255,.5)}
+.calc-half.double .calc-val{text-shadow:0 4px 24px rgba(255,79,184,.6)}
+.select{width:100%;padding:13px 44px 13px 16px;border-radius:14px;cursor:pointer;appearance:none;-webkit-appearance:none;
+  font:600 .95rem var(--font);color:var(--text);background-color:rgba(10,0,24,.45);border:1px solid rgba(255,255,255,.14);
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23ff9be0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center;transition:border-color .25s,box-shadow .25s}
+.select:hover{border-color:rgba(255,255,255,.3)}
+.select:focus{outline:none;border-color:rgba(255,79,184,.7);box-shadow:0 0 0 4px rgba(255,79,184,.14)}
+.select option{background:#2d0a4e;color:#fff}
+#logInput{flex:none;height:clamp(120px,18vh,170px);min-height:100px;resize:vertical;width:100%;padding:16px;border-radius:16px;
+  font:.88rem/1.6 ui-monospace,"Cascadia Mono",Consolas,monospace;color:var(--text);caret-color:var(--pink);
+  background:rgba(10,0,24,.45);border:1px solid rgba(255,255,255,.14);transition:border-color .25s,box-shadow .25s}
+#logInput::placeholder{color:rgba(247,240,255,.4)}
+#logInput:focus{border-color:rgba(255,79,184,.7);box-shadow:0 0 0 4px rgba(255,79,184,.14)}
+.empty{flex:1;display:grid;place-items:center;text-align:center;color:var(--text-dim);padding:30px 10px;line-height:1.7;font-size:.92rem}
+.hero{position:relative;border-radius:20px;padding:22px 20px;text-align:center;overflow:hidden;
+  background:linear-gradient(135deg,rgba(122,43,209,.55),rgba(209,19,143,.5));border:1px solid rgba(255,255,255,.35);
+  box-shadow:0 18px 40px -16px rgba(209,19,143,.7),inset 0 1px 0 rgba(255,255,255,.5)}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.28),transparent 40%)}
+.hero>*{position:relative}
+.hero{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.unit-box{padding:6px 4px}
+.unit-box+.unit-box{border-left:1px solid rgba(255,255,255,.28)}
+.hero .num{font-size:clamp(2.6rem,5.5vw,4.2rem);font-weight:750;line-height:1;text-shadow:0 6px 30px rgba(255,79,184,.6);font-variant-numeric:tabular-nums}
+.hero .unit{font-size:1rem;font-weight:600;margin-top:8px}
+.ev{border-radius:16px;padding:14px 16px;background:var(--glass);border:1px solid var(--glass-border);display:grid;gap:4px}
+.ev small{color:var(--text-dim);font-size:.78rem}
+.ev b{font-size:1.02rem;font-weight:650;font-variant-numeric:tabular-nums}
+.ev span{font-size:.85rem;color:#ffd3f0;overflow-wrap:anywhere}
+.ev.miss{border-color:rgba(255,160,120,.5);background:rgba(255,120,80,.1)}
+.note{font-size:.8rem;color:#ffd3f0;padding:2px 4px}
+
+/* ============ 6c. OUTAGE CON ============ */
+.timer{display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,18px);padding:clamp(6px,2vw,20px) 0}
+.t-field{display:flex;flex-direction:column;align-items:center;gap:10px;font-weight:650;font-size:.92rem;color:var(--text-dim);cursor:text}
+.t-input{width:clamp(72px,12vw,130px);padding:clamp(14px,2vw,22px) 8px;border-radius:20px;text-align:center;
+  font:750 clamp(2.4rem,5vw,3.6rem)/1 var(--font);font-variant-numeric:tabular-nums;color:var(--text);caret-color:var(--pink);
+  background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(10,0,24,.5));border:1px solid rgba(255,255,255,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 12px 30px -14px rgba(0,0,0,.7);transition:border-color .25s,box-shadow .25s}
+.t-input::placeholder{color:rgba(247,240,255,.28)}
+.t-input:focus{outline:none;border-color:rgba(255,79,184,.8);box-shadow:0 0 0 4px rgba(255,79,184,.16),0 12px 30px -14px rgba(209,19,143,.7)}
+.t-sep{font-size:clamp(2.2rem,4.6vw,3.2rem);font-weight:700;color:var(--pink);padding-bottom:30px;text-shadow:0 0 18px rgba(255,79,184,.7)}
+
+/* ============ 6d. MOBILE LINE ADJUSTMENT ============ */
+.eq{display:flex;align-items:center;gap:clamp(10px,1.6vw,20px);padding:clamp(4px,1vw,10px) 0}
+.eq .select{flex:1 1 0;min-width:0}
+.eq-extra{display:contents}
+.eq-extra[hidden]{display:none}
+.eq-op{flex:none;font-size:clamp(1.8rem,3vw,2.4rem);font-weight:700;line-height:1;color:var(--pink);text-shadow:0 0 18px rgba(255,79,184,.7)}
+.out-box{flex:1.2 1 0;min-width:0;padding:13px 16px;border-radius:14px;cursor:default;font:700 1rem var(--font);color:#fff;
+  background:linear-gradient(135deg,rgba(122,43,209,.4),rgba(209,19,143,.35));border:1px solid rgba(255,255,255,.35);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 26px -14px rgba(209,19,143,.7)}
+.out-box::placeholder{color:rgba(255,255,255,.5);font-weight:600}
+.out-box:focus{outline:none;border-color:rgba(255,155,224,.8)}
+.pane-wide{grid-column:1/-1}
+.pane-wide .calc-half{min-height:clamp(120px,16vh,150px)}
+
+/* ============ 7. RESPONSIVE ============ */
+@media (max-width:420px){.t-input{width:64px;font-size:2rem;padding:12px 4px;border-radius:16px}.timer{gap:6px}.t-sep{font-size:1.8rem}}
+@media (max-width:900px){.eq{flex-direction:column;align-items:stretch}.eq-op{text-align:center}.tts{grid-template-columns:1fr}#logInput{height:140px}}
+@media (max-width:900px){
+  .status{display:none}
+  .tab svg{width:18px;height:18px}
+}
+@media (max-width:620px){
+  .header{border-radius:22px}
+  .logo{width:46px;height:46px;border-radius:15px}
+  .logo svg{width:27px;height:27px}
+  .brand-text span{display:none}
+  .nav{overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity;border-radius:18px}
+  .nav::-webkit-scrollbar{display:none}
+  .tab{flex:0 0 auto;padding:12px 16px;scroll-snap-align:center}
+  .workspace{border-radius:22px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HTML ============ -->
+<div class="bg" aria-hidden="true">
+  <div class="orb a"></div><div class="orb b"></div><div class="orb c"></div>
+  <div class="grid"></div><div class="ring"></div><div class="noise"></div>
+</div>
+
+<div class="app">
+  <header class="header glass">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l5.2 14L16 11l7.8 12L29 9"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <strong>WE Compensation Center</strong>
+        <span>Telecom Egypt · Marceleno Morcos · TL: Mennallah Ismail</span>
+      </div>
+    </div>
+
+    <a class="penguin" href="https://wa.me/201274942135" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <ellipse cx="32" cy="58" rx="20" ry="5" fill="rgba(40,0,70,.25)"/>
+        <ellipse cx="32" cy="36" rx="17" ry="21" fill="#1b1030"/>
+        <ellipse cx="32" cy="40" rx="11" ry="15" fill="#fff"/>
+        <ellipse cx="14.5" cy="38" rx="4" ry="11" fill="#1b1030" transform="rotate(14 14.5 38)"/>
+        <ellipse cx="49.5" cy="38" rx="4" ry="11" fill="#1b1030" transform="rotate(-14 49.5 38)"/>
+        <circle cx="26" cy="22" r="4.5" fill="#fff"/><circle cx="38" cy="22" r="4.5" fill="#fff"/>
+        <circle cx="26.8" cy="22.4" r="2.2" fill="#1b1030"/><circle cx="37.2" cy="22.4" r="2.2" fill="#1b1030"/>
+        <path d="M27.5 27.5 L36.5 27.5 L32 33.5 Z" fill="#ffa62b"/>
+        <ellipse cx="25" cy="56" rx="6" ry="2.6" fill="#ffa62b"/><ellipse cx="39" cy="56" rx="6" ry="2.6" fill="#ffa62b"/>
+      </svg>
+    </a>
+
+    <nav class="nav" role="tablist" aria-label="Compensation modules">
+      <div class="pill" id="pill"></div>
+      <button class="tab" role="tab" id="tab-tts" aria-selected="true" aria-controls="panel-tts" data-target="panel-tts">
+        <svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.4 2.4-2.6-.6-.6-2.6z"/></svg>
+        <span>TTS Tech Con</span>
+      </button>
+      <button class="tab" role="tab" id="tab-outage" aria-selected="false" aria-controls="panel-outage" data-target="panel-outage" tabindex="-1">
+        <svg viewBox="0 0 24 24"><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.4a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="19.5" r=".8"/><path d="M3 3l18 18"/></svg>
+        <span>Outage Con</span>
+      </button>
+      <button class="tab" role="tab" id="tab-mobile" aria-selected="false" aria-controls="panel-mobile" data-target="panel-mobile" tabindex="-1">
+        <svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10.5 18.5h3"/></svg>
+        <span>Mobile Line Adjustment</span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="stage">
+    <section class="workspace glass active" id="panel-tts" role="tabpanel" aria-labelledby="tab-tts">
+      <div class="tts">
+        <div class="col">
+          <div class="pane">
+            <div class="pane-head">
+              <h2>Ticket log</h2>
+              <div class="actions">
+                <button class="btn" id="clearBtn" type="button">Clear</button>
+              </div>
+            </div>
+            <textarea id="logInput" spellcheck="false" aria-label="Ticket log text" placeholder="Paste the full ticket history here"></textarea>
+          </div>
+          <div class="pane">
+            <div class="pane-head"><h2>Package quota</h2></div>
+            <select id="quotaSelect" class="select" aria-label="Package quota">
+              <option value="" selected disabled>Select quota</option>
+              <option value="150">150 GB</option>
+              <option value="200">200 GB</option>
+              <option value="250">250 GB</option>
+              <option value="400">400 GB</option>
+              <option value="750">750 GB</option>
+              <option value="1500">1500 GB</option>
+            </select>
+          </div>
+        </div>
+        <div class="col">
+          <div class="pane">
+            <div class="pane-head"><h2>Result</h2></div>
+            <div id="result" aria-live="polite"></div>
+          </div>
+          <div class="pane pane-calc">
+            <div class="pane-head"><h2>Calculation</h2></div>
+            <div id="calcBox"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="workspace glass" id="panel-outage" role="tabpanel" aria-labelledby="tab-outage">
+      <div class="tts">
+        <div class="pane">
+          <div class="pane-head"><h2>Outage duration</h2></div>
+          <div class="timer">
+            <label class="t-field"><input class="t-input" id="outageDays" type="text" inputmode="numeric" maxlength="3" placeholder="0" autocomplete="off" aria-label="Days"><span>Days</span></label>
+            <div class="t-sep" aria-hidden="true">:</div>
+            <label class="t-field"><input class="t-input" id="outageHours" type="text" inputmode="numeric" maxlength="2" placeholder="0" autocomplete="off" aria-label="Hours"><span>Hours</span></label>
+            <div class="t-sep" aria-hidden="true">:</div>
+            <label class="t-field"><input class="t-input" id="outageMinutes" type="text" inputmode="numeric" maxlength="2" placeholder="0" autocomplete="off" aria-label="Minutes"><span>Minutes</span></label>
+          </div>
+        </div>
+        <div class="pane">
+          <div class="pane-head"><h2>Package quota</h2></div>
+          <select id="outageQuota" class="select" aria-label="Package quota">
+            <option value="" selected disabled>Select quota</option>
+            <option value="150">150 GB</option>
+            <option value="200">200 GB</option>
+            <option value="250">250 GB</option>
+            <option value="400">400 GB</option>
+            <option value="750">750 GB</option>
+            <option value="1500">1500 GB</option>
+          </select>
+        </div>
+        <div class="pane pane-wide">
+          <div class="pane-head"><h2>Calculation</h2></div>
+          <div class="calc-grid" id="outGrid">
+            <div class="calc-half"><small>Compensation</small><div class="calc-val" id="outComp">—</div><em id="outCompNote"></em></div>
+            <div class="calc-half double"><small>Double</small><div class="calc-val" id="outDouble">—</div><em id="outDoubleNote"></em></div>
+          </div>
+          <div id="outAlertBox"></div>
+        </div>
+      </div>
+    </section>
+    <section class="workspace glass" id="panel-mobile" role="tabpanel" aria-labelledby="tab-mobile">
+      <div class="tts">
+        <div class="pane pane-wide">
+          <div class="pane-head"><h2>Line adjustment</h2></div>
+          <div class="eq">
+            <select id="mlSelectA" class="select" aria-label="First selection">
+              <option value="" selected disabled>Select option</option>
+              <option value="Physical Instability">Physical Instability</option>
+              <option value="Bad Line Quality">Bad Line Quality</option>
+              <option value="outage">outage</option>
+              <option value="Data Down">Data Down</option>
+              <option value="Data Down ( while selt = 0 )">Data Down ( while selt = 0 )</option>
+            </select>
+            <div class="eq-op" aria-hidden="true">+</div>
+            <select id="mlSelectB" class="select" aria-label="Second selection">
+              <option value="" selected disabled>Select option</option>
+              <option value="Within SLA">Within SLA</option>
+              <option value="After SLA">After SLA</option>
+            </select>
+            <div class="eq-extra" id="mlExtra" hidden>
+              <div class="eq-op" aria-hidden="true">+</div>
+              <select id="mlSelectC" class="select" aria-label="Package quota">
+                <option value="" selected disabled>Select quota</option>
+                <option value="150">150 GB</option>
+                <option value="200">200 GB</option>
+                <option value="250">250 GB</option>
+                <option value="400">400 GB</option>
+                <option value="750">750 GB</option>
+                <option value="1500">1500 GB</option>
+              </select>
+            </div>
+            <div class="eq-op" aria-hidden="true">=</div>
+            <input id="mlResult" class="out-box" type="text" readonly aria-label="Result" placeholder="Result" autocomplete="off">
+          </div>
+          <div id="mlAlertBox"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ JAVASCRIPT ============ -->
+<script>
+(function () {
+  'use strict';
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.workspace'));
+  var pill = document.getElementById('pill');
+  var nav = document.querySelector('.nav');
+
+  function movePill(tab) {
+    pill.style.width = tab.offsetWidth + 'px';
+    pill.style.transform = 'translateX(' + tab.offsetLeft + 'px)';
+  }
+
+  function activate(tab, focus) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+    });
+    panels.forEach(function (p) {
+      p.classList.toggle('active', p.id === tab.dataset.target);
+    });
+    movePill(tab);
+    if (nav.scrollWidth > nav.clientWidth) {
+      tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+    if (focus) tab.focus();
+    try { history.replaceState(null, '', '#' + tab.id.replace('tab-', '')); } catch (e) {}
+  }
+
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () { activate(tab, false); });
+    tab.addEventListener('keydown', function (e) {
+      var next = null;
+      if (e.key === 'ArrowRight') next = tabs[(i + 1) % tabs.length];
+      if (e.key === 'ArrowLeft') next = tabs[(i - 1 + tabs.length) % tabs.length];
+      if (e.key === 'Home') next = tabs[0];
+      if (e.key === 'End') next = tabs[tabs.length - 1];
+      if (next) { e.preventDefault(); activate(next, true); }
+    });
+  });
+
+  function current() {
+    return tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0] || tabs[0];
+  }
+
+  var raf;
+  window.addEventListener('resize', function () {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(function () { movePill(current()); });
+  });
+
+  var initial = tabs.filter(function (t) { return '#' + t.id.replace('tab-', '') === location.hash; })[0] || tabs[0];
+  pill.style.transition = 'none';
+  activate(initial, false);
+  requestAnimationFrame(function () { requestAnimationFrame(function () { pill.style.transition = ''; }); });
+
+  /* ---------- TTS Tech Con: ticket log parser ---------- */
+  var DATE_RE = /(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})\s*,?\s*(\d{1,2}):(\d{2})\s*(AM|PM)?/i;
+  var TRANSFER_RE = /transfer+ed\s*:\s*IU\s*Maintenance/i;
+  var CLOSE_RE = /ticket\s*info\s*:\s*(close\s*code[^\r\n]*)/i;
+  var input = document.getElementById('logInput');
+  var out = document.getElementById('result');
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function parseDate(line) {
+    var m = line.match(DATE_RE);
+    if (!m) return null;
+    var h = +m[4], ap = m[6] ? m[6].toUpperCase() : '';
+    if (ap === 'PM' && h < 12) h += 12;
+    if (ap === 'AM' && h === 12) h = 0;
+    return {
+      raw: m[0].replace(/\s+/g, ' ').trim(),
+      time: Date.UTC(+m[3], +m[2] - 1, +m[1], h, +m[5]),
+      day: Date.UTC(+m[3], +m[2] - 1, +m[1])
+    };
+  }
+
+  // finds every line matching re, paired with the nearest date at or above it
+  function findEvents(lines, re) {
+    var found = [];
+    lines.forEach(function (line, i) {
+      var m = line.match(re);
+      if (!m) return;
+      var d = parseDate(line);
+      for (var k = i - 1; !d && k >= 0 && i - k <= 5; k--) d = parseDate(lines[k]);
+      found.push({ index: i, date: d, text: (m[1] || '').trim() });
+    });
+    return found;
+  }
+
+  function card(label, value, extra, miss) {
+    return '<div class="ev' + (miss ? ' miss' : '') + '"><small>' + esc(label) + '</small><b>' + esc(value) + '</b>' +
+      (extra ? '<span>' + esc(extra) + '</span>' : '') + '</div>';
+  }
+
+  var lastMins = null;
+  function renderResult() {
+    lastMins = null;
+    var text = input.value.trim();
+    if (!text) {
+      out.innerHTML = '<div class="empty">Paste the ticket log on the left.<br>The days between the IU Maintenance transfer and the Close Code appear here automatically.</div>';
+      return;
+    }
+    var lines = text.split(/\r?\n/);
+    var transfers = findEvents(lines, TRANSFER_RE);
+    var closes = findEvents(lines, CLOSE_RE);
+    var t = transfers[0];
+    var c = closes[closes.length - 1];
+    var html = '', notes = [];
+
+    if (t && t.date && c && c.date) {
+      var mins = Math.round((c.date.time - t.date.time) / 60000);
+      lastMins = mins;
+      var sign = mins < 0 ? '-' : '';
+      var a = Math.abs(mins);
+      var parts = [[sign + Math.floor(a / 1440), 'Days'], [Math.floor((a % 1440) / 60), 'Hours'], [a % 60, 'Minutes']];
+      html += '<div class="hero">' + parts.map(function (p) {
+        return '<div class="unit-box"><div class="num">' + p[0] + '</div><div class="unit">' + p[1] + '</div></div>';
+      }).join('') + '</div>';
+      if (mins < 0) notes.push('The Close Code is dated before the transfer. Check the pasted text.');
+    }
+    html += card('Transfered: IU Maintenance', t && t.date ? t.date.raw : 'Not found', t && !t.date ? 'Line found, but no date above it' : '', !(t && t.date));
+    html += card('Ticket Info: Close Code', c && c.date ? c.date.raw : 'Not found', c ? c.text : '', !(c && c.date));
+    if (transfers.length > 1) notes.push(transfers.length + ' IU Maintenance transfers found. Using the first one.');
+    if (closes.length > 1) notes.push(closes.length + ' Close Codes found. Using the last one.');
+    notes.forEach(function (n) { html += '<div class="note">' + esc(n) + '</div>'; });
+    out.innerHTML = '<div style="display:grid;gap:12px">' + html + '</div>';
+  }
+
+  /* compensation = (quota / 30) x outage duration in days */
+  var quotaSel = document.getElementById('quotaSelect');
+  var calcBox = document.getElementById('calcBox');
+
+  function fmt(n, d) {
+    return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  }
+
+  function half(label, value, note, cls) {
+    return '<div class="calc-half ' + cls + '"><small>' + label + '</small>' +
+      '<div class="calc-val">' + (value === null ? '—' : fmt(value, 2) + ' <span>GB</span>') + '</div>' +
+      '<em>' + esc(note) + '</em></div>';
+  }
+
+  /* compensation above this (before double) must go through a ticket */
+  var LIMIT = 75;
+  var WIKI = 'https://sp-wiki.te.eg:5443/Pages/GSM/Postpaid/Voice/DSL%20general%20info.aspx#Normal_Process';
+  function alertHtml() {
+    return '<div class="alert"><p>Compensation is more than ' + LIMIT + ' GB. The agent must create a ticket and must not compensate on the spot.</p>' +
+      '<a class="btn-link" href="' + WIKI + '" target="_blank" rel="noopener noreferrer">Open process page</a></div>';
+  }
+
+  function calc() {
+    var q = parseFloat(quotaSel.value);
+    var ok = q > 0 && lastMins !== null && lastMins >= 0;
+    var base = ok ? (q / 30) * (lastMins / 1440) : null;
+    var n1 = ok ? fmt(q / 30, 2) + ' GB/day × ' + fmt(lastMins / 1440, 3) + ' day' : '';
+    if (base !== null && base > LIMIT) { calcBox.innerHTML = alertHtml(); return; }
+    calcBox.innerHTML = '<div class="calc-grid">' +
+      half('Compensation', base, n1, '') +
+      half('Double', base, ok ? 'Same as compensation' : '', 'double') +
+      '</div>';
+  }
+
+  function render() { renderResult(); calc(); }
+  quotaSel.addEventListener('change', calc);
+  input.addEventListener('input', render);
+  document.getElementById('clearBtn').addEventListener('click', function () { input.value = ''; render(); input.focus(); });
+  render();
+
+  /* ---------- Outage Con: timer inputs (digits only, hours 0-23) ---------- */
+  [['outageDays', 999], ['outageHours', 23], ['outageMinutes', 59]].forEach(function (cfg) {
+    var el = document.getElementById(cfg[0]);
+    el.addEventListener('input', function () {
+      var v = el.value.replace(/\D/g, '');
+      if (v !== '' && +v > cfg[1]) v = String(cfg[1]);
+      el.value = v === '' ? '' : String(+v);
+    });
+    el.addEventListener('focus', function () { el.select(); });
+  });
+
+  /* Outage rules: <6h none | 6-12h fixed, no double | 12-24h fixed + same double | >24h (quota/30) x days, x2 double */
+  var FIXED = { 150: 3, 200: 5, 250: 5, 400: 10, 750: 10, 1500: 15 };
+  var oIn = ['outageDays', 'outageHours', 'outageMinutes'].map(function (id) { return document.getElementById(id); });
+  var oQuota = document.getElementById('outageQuota');
+  var oComp = document.getElementById('outComp'), oCompNote = document.getElementById('outCompNote');
+  var oDouble = document.getElementById('outDouble'), oDoubleNote = document.getElementById('outDoubleNote');
+
+  function gb(v) { return fmt(v, v % 1 === 0 ? 0 : 2); }
+  function show(el, noteEl, v, note) {
+    el.innerHTML = v === null ? '—' : gb(v) + ' <span>GB</span>';
+    noteEl.textContent = note || '';
+  }
+
+  var oAlert = document.getElementById('outAlertBox');
+  var oGrid = document.getElementById('outGrid');
+  function outageCalc() {
+    oAlert.innerHTML = '';
+    oGrid.style.display = '';
+    var q = parseFloat(oQuota.value);
+    var typed = oIn.some(function (el) { return el.value !== ''; });
+    if (!(q > 0) || !typed) { show(oComp, oCompNote, null); show(oDouble, oDoubleNote, null); return; }
+    var d = +oIn[0].value || 0, h = +oIn[1].value || 0, m = +oIn[2].value || 0;
+    var hours = d * 24 + h + m / 60;
+    if (hours < 6) {
+      show(oComp, oCompNote, 0, 'Under 6 hours: no compensation');
+      show(oDouble, oDoubleNote, null, 'No double');
+    } else if (hours < 12) {
+      show(oComp, oCompNote, FIXED[q], '6 to 12 hours');
+      show(oDouble, oDoubleNote, null, 'No double');
+    } else if (hours <= 24) {
+      show(oComp, oCompNote, FIXED[q], '12 to 24 hours');
+      show(oDouble, oDoubleNote, FIXED[q], 'Same as compensation');
+    } else {
+      var base = (q / 30) * (hours / 24);
+      show(oComp, oCompNote, base, fmt(q / 30, 2) + ' GB/day × ' + fmt(hours / 24, 3) + ' day');
+      show(oDouble, oDoubleNote, base, 'Same as compensation');
+      if (base > LIMIT) { oAlert.innerHTML = alertHtml(); oGrid.style.display = 'none'; }
+    }
+  }
+  oIn.forEach(function (el) { el.addEventListener('input', outageCalc); });
+  oQuota.addEventListener('change', outageCalc);
+
+  /* ---------- Mobile Line Adjustment: option A + option B = result ---------- */
+  var mlA = document.getElementById('mlSelectA');
+  var mlB = document.getElementById('mlSelectB');
+  var mlOut = document.getElementById('mlResult');
+  var ML_RESULT = { 'Within SLA': '3 GB for 2 days' }; // applies to every option in the first list except Data Down
+
+  var mlC = document.getElementById('mlSelectC');
+  var mlExtra = document.getElementById('mlExtra');
+
+  var mlAlert = document.getElementById('mlAlertBox');
+  var ML_TICKET = 'https://bss.te.eg:12900/csp/sr/business.action?BMEBusiness=srNewSrPage&srTypeName=We%20Mobile%20Adjustment&srTypeId=101024018&t=1752144933641&tabId=sr0.5336541634859296&topUrl=&custid=&subsNumber=&BMEWebToken=null';
+  // After SLA, by package: result text, and whether a ticket is required (no on-the-spot compensation)
+  var ML_AFTER = {
+    150: { r: '5 GB for 3 days' },
+    200: { r: '10 GB for 7 days', ticket: true },
+    250: { r: '10 GB for 7 days', ticket: true },
+    400: { r: '10 GB for 7 days', ticket: true },
+    750: { r: '20 GB for 15 days', ticket: true },
+    1500: { r: '20 GB for 15 days', ticket: true }
+  };
+
+  function mlCalc() {
+    var after = mlB.value === 'After SLA';
+    mlExtra.hidden = !after;
+    if (!after) mlC.selectedIndex = 0;
+    var result = '', ticket = false;
+    if (mlA.value) {
+      if (mlB.value === 'Within SLA') result = (mlA.value === 'Data Down') ? 'Not available' : ML_RESULT['Within SLA'];
+      else if (after && ML_AFTER[mlC.value]) { result = ML_AFTER[mlC.value].r; ticket = !!ML_AFTER[mlC.value].ticket; }
+    }
+    mlOut.value = result;
+    mlAlert.innerHTML = ticket
+      ? '<div class="alert"><p>The agent must not compensate on the spot. Create a ticket using the button.</p>' +
+        '<a class="btn-link" href="' + esc(ML_TICKET) + '" target="_blank" rel="noopener noreferrer">Create ticket</a></div>'
+      : '';
+  }
+  mlA.addEventListener('change', mlCalc);
+  mlB.addEventListener('change', mlCalc);
+  mlC.addEventListener('change', mlCalc);
+
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { movePill(current()); });
+})();
+</script>
+</body>
+</html>
